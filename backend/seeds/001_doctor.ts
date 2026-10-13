@@ -7,7 +7,6 @@ import { query, pool } from "../src/config/database";
     const password = "dokter123";
     const hash = await hashPassword(password);
 
-    // 1. Seeder dokter
     const users = await query(
       `INSERT INTO users (name, email, phone, password_hash, role)
        VALUES ($1, $2, $3, $4, 'doctor')
@@ -21,7 +20,6 @@ import { query, pool } from "../src/config/database";
 
     console.log("✅ Dokter dibuat/diupdate:", users[0]);
 
-    // 2. Seeder layanan
     const services: [string, number, number][] = [
       ["Konsultasi", 50000, 15],
       ["Scaling", 250000, 30],
@@ -32,7 +30,6 @@ import { query, pool } from "../src/config/database";
       ["Bleaching", 900000, 60],
     ];
 
-    // Cek apakah sudah ada services, kalau kosong baru isi
     const existing = await query<{ count: string }>(
       "SELECT COUNT(*)::text AS count FROM services",
     );
@@ -45,9 +42,7 @@ import { query, pool } from "../src/config/database";
       }
       console.log(`✅ ${services.length} layanan ditambahkan`);
     } else {
-      console.log(
-        `ℹ️  Services sudah ada (${existing[0].count} baris), skip seeder layanan`,
-      );
+      console.log(`ℹ️  Services sudah ada (${existing[0].count} baris), skip`);
     }
 
     console.log("");
@@ -56,9 +51,9 @@ import { query, pool } from "../src/config/database";
     console.log("   Email    :", email);
     console.log("   Password :", password);
     console.log("======================================");
-    console.log("");
   } catch (err) {
     console.error("❌ Seeder gagal:", err);
+    process.exitCode = 1;
   } finally {
     await pool.end();
   }

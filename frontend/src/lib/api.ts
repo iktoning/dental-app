@@ -1,7 +1,10 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+// ============================================
+// Authenticated API (butuh login)
+// ============================================
 export const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -33,8 +36,12 @@ api.interceptors.response.use(
   },
 );
 
-// Public API (tanpa token)
+// ============================================
+// Public API (tanpa login, untuk pasien)
+// ============================================
 export const publicApi = axios.create({
   baseURL: `${API_URL}/public`,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
