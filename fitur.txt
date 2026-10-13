@@ -1,0 +1,6 @@
+tampilan layar ruang tunggu
+- pasien walk in dapat mengambil tiket
+- pasien dapat melihat antrian
+- pasien dapat menambah data diri (daftar)
+- opsi a: pasien mendapat kertas antrian
+- obsi b: pasien tidak dapat kertas antrian tetapi dapat melihat antrian pada layar
