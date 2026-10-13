@@ -3,18 +3,26 @@ import { env } from "./env";
 
 types.setTypeParser(1082, (val: string) => val);
 
-// Railway / Heroku / cloud biasanya pakai DATABASE_URL
 const useUrl = !!process.env.DATABASE_URL;
 
-export const pool = new Pool({
-  host: env.db.host,
-  port: env.db.port,
-  user: env.db.user,
-  password: env.db.password,
-  database: env.db.name,
-  // Set timezone koneksi ke Asia/Jakarta
-  options: "-c timezone=Asia/Jakarta",
-});
+console.log(
+  "🔍 DB Connection Mode:",
+  useUrl ? "DATABASE_URL" : "Individual vars",
+);
+
+export const pool = useUrl
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+    })
+  : new Pool({
+      host: env.db.host,
+      port: env.db.port,
+      user: env.db.user,
+      password: env.db.password,
+      database: env.db.name,
+      options: "-c timezone=Asia/Jakarta",
+    });
 
 pool.on("error", (err) => {
   console.error("Unexpected DB error:", err);
