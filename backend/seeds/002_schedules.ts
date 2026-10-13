@@ -5,7 +5,11 @@ import { query, pool } from "../src/config/database";
     const doctorRows = await query<{ id: string }>(
       `SELECT id FROM users WHERE email = 'dokter@example.com'`,
     );
-    if (doctorRows.length === 0) throw new Error("Dokter tidak ditemukan");
+    if (doctorRows.length === 0) {
+      throw new Error(
+        "Dokter tidak ditemukan. Jalankan seeder 001_doctor.ts dulu.",
+      );
+    }
     const doctorId = doctorRows[0].id;
 
     // Cek apakah sudah ada jadwal
@@ -13,20 +17,20 @@ import { query, pool } from "../src/config/database";
       "SELECT COUNT(*)::text AS count FROM doctor_schedules WHERE doctor_id = $1",
       [doctorId],
     );
+
     if (existing[0].count !== "0") {
       console.log("ℹ️  Jadwal sudah ada, skip seeder");
-      await pool.end();
-      return;
+      return; // ← keluar dari try, biarkan finally yang tutup pool
     }
 
-    // Senin-Jumat: 09:00-17:00, Sabtu: 09:00-13:00, Minggu: libur
+    // Senin-Jumat: 09:00-17:00, Sabtu: 09:00-13:00
     const schedules = [
-      { day: 1, start: "09:00", end: "17:00" }, // Senin
-      { day: 2, start: "09:00", end: "17:00" }, // Selasa
-      { day: 3, start: "09:00", end: "17:00" }, // Rabu
-      { day: 4, start: "09:00", end: "17:00" }, // Kamis
-      { day: 5, start: "09:00", end: "17:00" }, // Jumat
-      { day: 6, start: "09:00", end: "13:00" }, // Sabtu
+      { day: 1, start: "09:00", end: "17:00" },
+      { day: 2, start: "09:00", end: "17:00" },
+      { day: 3, start: "09:00", end: "17:00" },
+      { day: 4, start: "09:00", end: "17:00" },
+      { day: 5, start: "09:00", end: "17:00" },
+      { day: 6, start: "09:00", end: "13:00" },
     ];
 
     for (const s of schedules) {
@@ -45,7 +49,9 @@ import { query, pool } from "../src/config/database";
     console.log("  Minggu     : Libur");
   } catch (err) {
     console.error("❌ Seeder gagal:", err);
+    process.exitCode = 1;
   } finally {
+    // HANYA di sini pool.end() dipanggil
     await pool.end();
   }
 })();
