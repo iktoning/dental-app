@@ -15,7 +15,6 @@ import { query, pool } from "../src/config/database";
     );
     if (existing[0].count !== "0") {
       console.log("ℹ️  Jadwal sudah ada, skip seeder");
-      await pool.end();
       return;
     }
 
